@@ -26,14 +26,11 @@ export interface Edge {
   onClick?: () => void;
 }
 
-interface Graph {
+interface NetworkGraphSVGProps {
   nodes: Node[];
   edges: Edge[];
-}
-
-interface Options {
-  height: string;
-  width?: string;
+  width?: number;
+  height?: number;
   defaultNode?: {
     shapeType: ShapeType;
     lineColor: string;
@@ -46,36 +43,36 @@ interface Options {
   };
 }
 
-interface NetworkGraphSVGProps {
-  graph: Graph;
-  options: Options;
-}
-
-const NetworkGraphSVG: React.FC<NetworkGraphSVGProps> = ({ graph, options }) => {
-  const height = parseInt(options.height, 10);
-  const width = parseInt(options.width ?? options.height, 10);
+const NetworkGraphSVG: React.FC<NetworkGraphSVGProps> = ({ 
+  nodes, 
+  edges, 
+  width = 400, 
+  height = 400,
+  defaultNode: defaultNodeProps,
+  defaultEdge: defaultEdgeProps
+}) => {
   const centerX = width / 2;
   const centerY = height / 2;
   const radius = Math.min(width, height) / 2 - 50;
 
   // Safe fallback for defaults
   const defaultNode = {
-    shapeType: 'circle',
+    shapeType: 'circle' as ShapeType,
     lineColor: '#000',
     lineWidth: 1,
     fillColor: '#fff',
-    ...options.defaultNode,
+    ...defaultNodeProps,
   };
 
   const defaultEdge = {
     lineColor: '#000',
     lineWidth: 1,
-    ...options.defaultEdge,
+    ...defaultEdgeProps,
   };
 
   const nodesWithPosition: Node[] = (() => {
     // Group nodes by tier (default to 3)
-    const nodesByTier = graph.nodes.reduce<Record<number, Node[]>>((acc, node) => {
+    const nodesByTier = nodes.reduce<Record<number, Node[]>>((acc, node) => {
       const tier = node.tier ?? 3;
       if (!acc[tier]) acc[tier] = [];
       acc[tier].push(node);
@@ -85,14 +82,14 @@ const NetworkGraphSVG: React.FC<NetworkGraphSVGProps> = ({ graph, options }) => 
     // Position nodes for each tier
     const positionedNodes: Node[] = [];
 
-    Object.entries(nodesByTier).forEach(([tierStr, nodes]) => {
+    Object.entries(nodesByTier).forEach(([tierStr, tierNodes]) => {
       const tier = parseInt(tierStr, 10);
       // Calculate radius for this tier (equal spacing: tier 1 = 1/3, tier 2 = 2/3, tier 3 = 3/3)
       const tierRadius = radius * (tier / 3);
 
-      nodes.forEach((node, index) => {
+      tierNodes.forEach((node, index) => {
         // Start from top (-π/2) and distribute evenly to avoid same Y positions
-        const angle = -Math.PI / 2 + (index / nodes.length) * 2 * Math.PI;
+        const angle = -Math.PI / 2 + (index / tierNodes.length) * 2 * Math.PI;
         positionedNodes.push({
           ...node,
           x: centerX + tierRadius * Math.cos(angle),
@@ -112,7 +109,7 @@ const NetworkGraphSVG: React.FC<NetworkGraphSVGProps> = ({ graph, options }) => 
   return (
     <svg width={width} height={height} style={{ border: '1px solid #ddd' }}>
       {/* Edges */}
-      {graph.edges.map((edge, i) => {
+      {edges.map((edge, i) => {
         const from = nodeMap[edge.from];
         const to = nodeMap[edge.to];
         if (!from || !to) return null;

@@ -1,12 +1,31 @@
 {
   "name": "@aimabel/react-network-graph-svg",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A React component for rendering network graphs as SVG",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    }
+  },
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "react",
+    "network",
+    "graph",
+    "svg",
+    "visualization"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
@@ -15,5 +34,8 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "typescript": "^5.8.3"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0"
   }
 }

@@ -1,1 +1,1 @@
-export { default as NetworkGraphSVG } from './NetworkGraphSVG'; 
+export { default as NetworkGraphSVG, type Node, type Edge } from './NetworkGraphSVG'; 
